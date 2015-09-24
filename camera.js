@@ -16,7 +16,7 @@ camera.on('ready', function() {
             var name = 'picture-' + Math.floor(Date.now()*1000) + '.jpg';
             // Save the image
             console.log('Picture saving as', name, '...');
-            process.sendfile(name, image);
+            process.sendfile(name,image);
             console.log('done.');
             // Turn the camera off to end the script
             camera.disable();
@@ -27,3 +27,5 @@ camera.on('ready', function() {
 camera.on('error', function(err) {
     console.error(err);
 });
+
+
