@@ -7,8 +7,8 @@ var tessel = require('tessel'),
 var notificationLED = tessel.led[3]; // Set up an LED to notify when we're taking a picture
 
 //Amazon Web Service Credentials
-var AWS_ACCESS_KEY_ID= 'AKIAIMASO7SYYEMG447Q';
-var AWS_SECRET_ACCESS_KEY ='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';
+var AWS_ACCESS_KEY_ID= '';
+var AWS_SECRET_ACCESS_KEY ='';
 var S3_BUCKET='iot-tussel';
 var S3_AWS_BASE_URL ='https://s3-us-west-2.amazonaws.com';
 
