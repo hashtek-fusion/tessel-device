@@ -11,6 +11,7 @@ var AWS_ACCESS_KEY_ID= '';
 var AWS_SECRET_ACCESS_KEY ='';
 var S3_BUCKET='iot-tussel';
 var S3_AWS_BASE_URL ='https://s3-us-west-2.amazonaws.com';
+var PROXY_BASE_URL=''; //Proxy Node JS which route AWS SQS communication
 
 camera.on('ready', function() {
     console.log('Camera module is ready');
@@ -73,9 +74,10 @@ function publishPicture(name, image , cb){
 
 function listenMessage(){
    console.log('Inside listen messages');
+    var URL_TO_LISTEN=PROXY_BASE_URL +'/sqs/listen';
    request({
        method:'GET',
-       url:'http://52.10.43.41:8080/api/aws/sqs/listen'
+       url:URL_TO_LISTEN
    }, function (err, response, body){
        if(err){
            console.log('Error while listening msgs:' + err);
@@ -116,9 +118,10 @@ function listenMessage(){
 
 function deleteMessage(msgToDelete, cb){
     console.log('Message to be deleted::' + msgToDelete);
+    var URL_TO_LISTEN=PROXY_BASE_URL +'/sqs/remove?id='+msgToDelete;
     request({
         method:'GET',
-        url:'http://52.10.43.41:8080/api/aws/sqs/remove?id='+msgToDelete
+        url:URL_TO_LISTEN
     }, function(err, data){
         cb(err, data);
     })
