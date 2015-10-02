@@ -4,7 +4,7 @@ var request = require('request'),
 var tessel = require('tessel'),
     camera = require('camera-vc0706').use(tessel.port['A']);
 
-var notificationLED = tessel.led[3]; // Set up an LED to notify when we're taking a picture
+var notificationLED = tessel.led[2]; // Set up an LED to notify when we're taking a picture
 
 //Amazon Web Service Credentials
 var AWS_ACCESS_KEY_ID= '';
@@ -22,7 +22,7 @@ camera.on('error', function(err) {
     console.error('Error in loading camera module::'+ err);
 });
 
-function takePicture(cb){
+function takePicture(photoName,cb){
     // Take the picture
     notificationLED.high();
     camera.takePicture(function(err, image) {
@@ -32,11 +32,12 @@ function takePicture(cb){
         } else {
             notificationLED.low();
             // Name the image
-            var name = 'picture' + Math.floor(Date.now()*10) + '.jpg';
+            var name = 'TesselPicture' + Math.floor(Date.now()*1000) + '.jpg';
+            if(photoName==='') photoName=name;
             // Save the image
             //console.log('Picture saving as', name, '...');
             //process.sendfile(name,image);
-            publishPicture(name, image, cb);
+            publishPicture(photoName, image, cb);
         }
     });
 }
@@ -88,16 +89,26 @@ function listenMessage(){
            console.log('Message from Q::' + messages.length);
            var msg='EXIT';
            var receiptHandle='';
+           var photoName='';
            for(var i=0; i< messages.length; i++){
-               msg = messages[i].body;
-               msg=msg.trim();
+               var msgObj = messages[i].body;
+               console.log('Message object before split::' + msgObj);
+               var msgArr=[];
+               if(msgObj!='' && msgObj.indexOf('|')!=-1) {
+                   console.log('Msg validation passed');
+                   msgArr = msgObj.split('|');
+                   if (msgArr.length === 2) {
+                       msg = msgArr[0];
+                       photoName = msgArr[1];
+                   }
+               }
                console.log('Message in the loop ::' + msg);
                receiptHandle= messages[i].receiptHandle;
                if(msg==='TAKE_PHOTO') break;
            }
 
            if(msg==='TAKE_PHOTO') {
-               takePicture(function(err, data){
+               takePicture(photoName,function(err, data){
                    if(err){
                        console.log('Error while taking picture & uploading :' + err);
                        camera.disable();//script will be terminated and to restart the script
